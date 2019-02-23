@@ -10,8 +10,9 @@ class Snake:
     def __init__(self, max_y, max_x):
         """
         Snake object.
-        The positions x and y are the inverse of what is usually used in a matrix notation, considering a matrix x is
-        a column index and y is a row index.
+        The positions x and y are the inverse of what is usually used in a
+        matrix notation, considering a matrix x is a column index and y is a
+        row index.
 
         :param max_y: maximum value for y
         :type max_y: int

@@ -51,9 +51,8 @@ class Game:
             elif c == ord('q'):
                 exit(0)
 
-            time.sleep(0.2)
+            time.sleep(0.1)
             self.snake.move(self.snake.last_key)
-
 
     def render(self):
         """
