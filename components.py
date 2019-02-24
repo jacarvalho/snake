@@ -19,10 +19,18 @@ class Snake:
         :param max_x: maximum value for x
         :type max_x: int
         """
-        self.symbol = 'o'
-        self.body = [{'y': max_y // 2, 'x': max_x // 2, 'direction': 'LEFT'}]
+        self.head_symbol = 'O'
+        self.body_symbol = 'o'
+        self.head_direction = 'RIGHT'
+        self.tail_direction = self.head_direction
+        self.body = [{'y': max_y // 2, 'x': max_x // 2}]
         self.length = 1
-        self.turning_points = []
+        self.initial_start()
+
+    def initial_start(self):
+        for i in range(1, 3):
+            self.body.append({'y': self.body[i-1]['y'], 'x': self.body[i-1]['x']-1})
+            self.length += 1
 
     def get_head_position(self):
         """
@@ -44,67 +52,62 @@ class Snake:
         """
         Adds an element to the snake body at its tail.
         """
-        tail = self.body[-1]
-        y = tail['y']
-        x = tail['x']
-        direction = tail['direction']
-        if direction == 'UP':
-            self.body.append({'y': y+1, 'x': x, 'direction': direction})
-        elif direction == 'DOWN':
-            self.body.append({'y': y-1, 'x': x, 'direction': direction})
-        elif direction == 'LEFT':
-            self.body.append({'y': y, 'x': x+1, 'direction': direction})
-        elif direction == 'RIGHT':
-            self.body.append({'y': y, 'x': x-1, 'direction': direction})
+        # Get tail position.
+        t_y = self.body[-1]['y']
+        t_x = self.body[-1]['x']
+
+        # Update tail.
+        y, x = 0, 0
+        if self.tail_direction == 'UP':
+            y += 1
+        elif self.tail_direction == 'DOWN':
+            y -= 1
+        elif self.tail_direction == 'LEFT':
+            x += 1
+        elif self.tail_direction == 'RIGHT':
+            x -= 1
+
+        self.body.append({'y': t_y + y, 'x': t_x + x})
         self.length += 1
 
-    def move_body(self):
+    def move(self, direction):
         """
-        Move the snake body.
+        Move the snake.
+
+        :param direction: direction of movement (-1, UP, DOWN, RIGHT, LEFT)
         """
-        for i, snake_p in enumerate(self.body):
-            s_y = snake_p['y']
-            s_x = snake_p['x']
+        # Move the snake body except for the head.
+        for i in range(self.length - 1, 0, -1):
+            self.body[i]['y'] = self.body[i-1]['y']
+            self.body[i]['x'] = self.body[i-1]['x']
 
-            # At a turning point, change the direction.
-            for turn_point in self.turning_points:
-                t_y = turn_point['y']
-                t_x = turn_point['x']
-                t_d = turn_point['direction']
-                if s_y == t_y and s_x == t_x:
-                    snake_p['direction'] = t_d
-                    if i == self.length - 1:
-                        # When the tail reaches a turning point, delete the first turning point.
-                        del self.turning_points[0]
+        # Move the snake head.
+        if direction != -1:
+            self.head_direction = direction
+        y, x = 0, 0
+        if self.head_direction == 'UP':
+            y -= 1
+        elif self.head_direction == 'DOWN':
+            y += 1
+        elif self.head_direction == 'LEFT':
+            x -= 1
+        elif self.head_direction == 'RIGHT':
+            x += 1
+        self.body[0]['y'] += y
+        self.body[0]['x'] += x
 
-            d = snake_p['direction']
-            y, x = 0, 0
-            if d == 'UP':
-                y -= 1
-            elif d == 'DOWN':
-                y += 1
-            elif d == 'LEFT':
-                x -= 1
-            elif d == 'RIGHT':
-                x += 1
-            snake_p['y'] += y
-            snake_p['x'] += x
-
-    def move(self, ch=None):
-        """
-        Move the snake head.
-
-        :param ch: direction of movement
-        """
-        if ch:
-            # Set a turning point if directions do not match.
-            if ch != self.body[0]['direction']:
-                if self.length != 1:
-                    y = self.body[0]['y']
-                    x = self.body[0]['x']
-                    self.turning_points.append({'y': y, 'x': x, 'direction': ch})
-            self.body[0]['direction'] = ch
-        self.move_body()
+        # Update the tail direction.
+        if self.length == 1:
+            self.tail_direction = self.head_direction
+        else:
+            if self.body[-1]['y'] > self.body[-2]['y']:
+                self.tail_direction = 'UP'
+            elif self.body[-1]['y'] < self.body[-2]['y']:
+                self.tail_direction = 'DOWN'
+            elif self.body[-1]['x'] > self.body[-2]['x']:
+                self.tail_direction = 'LEFT'
+            elif self.body[-1]['x'] < self.body[-2]['x']:
+                self.tail_direction = 'RIGHT'
 
     def check_collision(self):
         """
@@ -115,9 +118,9 @@ class Snake:
         if self.length == 1:
             return False
         h_y, h_x = self.body[0]['y'], self.body[0]['x']
-        for snake_p in self.body[1:-1]:
-            b_y = snake_p['y']
-            b_x = snake_p['x']
+        for body_part in self.body[1:]:
+            b_y = body_part['y']
+            b_x = body_part['x']
             if h_y == b_y and h_x == b_x:
                 return True
         return False
@@ -138,9 +141,9 @@ class Food:
         self.max_x = max_x
         self.x = None
         self.y = None
-        self.random_position()
+        self.generate_random_position()
 
-    def get_position(self):
+    def get_current_position(self):
         """
         Getter for the current position of the food.
 
@@ -148,7 +151,7 @@ class Food:
         """
         return self.y, self.x
 
-    def random_position(self):
+    def generate_random_position(self):
         """
         Generate a random position for the food.
         """
