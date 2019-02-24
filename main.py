@@ -20,5 +20,5 @@ if __name__ == '__main__':
 
     # Start game.
     curses.wrapper(Game,
-                   int(config['DEFAULT']['WINDOW_HEIGHT']),
-                   int(config['DEFAULT']['WINDOW_WIDTH']))
+                   board_height=int(config['DEFAULT']['WINDOW_HEIGHT']),
+                   board_width=int(config['DEFAULT']['WINDOW_WIDTH']))

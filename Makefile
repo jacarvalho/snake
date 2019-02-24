@@ -1,5 +1,5 @@
 TEST_CMD = python3 -m unittest -v
-CHECKSTYLE_CMD = pycodestyle --first --max-line-length=99
+CHECKSTYLE_CMD = pycodestyle --first --max-line-length=120
 
 all: compile test checkstyle
 
