@@ -7,83 +7,119 @@ from random import randint
 
 class Snake:
 
-    def __init__(self, max_y, max_x):
+    def __init__(self, y=0, x=0, initial_size=3):
         """
         Snake object.
         The positions x and y are the inverse of what is usually used in a
         matrix notation, considering a matrix x is a column index and y is a
-        row index.
+        row index. The top left corner is (0, 0).
 
-        :param max_y: maximum value for y
-        :type max_y: int
-        :param max_x: maximum value for x
-        :type max_x: int
+        :param y: y position of snake head
+        :type y: int
+        :param x: x position of snake head
+        :type x: int
+        :param initial_size: initial size for the snake
+        :type initial_size: int
         """
         self.head_symbol = 'O'
         self.body_symbol = 'o'
         self.head_direction = 'RIGHT'
-        self.tail_direction = self.head_direction
-        self.body = [{'y': max_y // 2, 'x': max_x // 2}]
-        self.length = 1
-        self.initial_start()
+        self.body = [{'y': y, 'x': x}]
+        self.size = initial_size
 
-    def initial_start(self):
-        for i in range(1, 3):
-            self.body.append({'y': self.body[i-1]['y'], 'x': self.body[i-1]['x']-1})
-            self.length += 1
+        self.setup_snake()
+
+    def setup_snake(self):
+        """
+        Setup a snake body horizontally with the head on the right side.
+        """
+        for i in range(0, self.size):
+            self.body.append({'y': self.body[i]['y'], 'x': self.body[i]['x']-1})
+            self.size += 1
 
     def get_head_position(self):
         """
-        Getter for the head position of the snake.
+        Getter for the snake head position.
 
         :return: y and x head position
         """
         return self.body[0]['y'], self.body[0]['x']
 
-    def get_body(self):
+    def get_tail_position(self):
         """
-        Getter for the snake body.
+        Getter for the snake tail position.
 
-        :return: list with x and y positions and direction of snake body
+        :return: y and x tail position
+        """
+        return self.body[-1]['y'], self.body[-1]['x']
+
+    def get_body_position(self, ind):
+        """
+        Getter for the snake body positions at ind.
+
+        :param ind: position index
+        :type ind: int
+        :return: y and x position at index ind
+        """
+        return self.body[ind]['y'], self.body[ind]['x']
+
+    def get_positions(self):
+        """
+        Getter for the snake positions.
+
+        :return: list with x and y positions of the snake
         """
         return self.body
+
+    def change_direction(self, direction):
+        """
+        Change the snake direction.
+
+        :param direction: direction of snake head
+        :type direction: str
+        """
+        self.head_direction = direction
 
     def increase_body(self):
         """
         Adds an element to the snake body at its tail.
         """
-        # Get tail position.
-        t_y = self.body[-1]['y']
-        t_x = self.body[-1]['x']
+        y, x = self.get_tail_position()
+        if self.size == 1:
+            if self.head_direction == 'UP':
+                y += 1
+            elif self.head_direction == 'DOWN':
+                y -= 1
+            elif self.head_direction == 'LEFT':
+                x += 1
+            elif self.head_direction == 'RIGHT':
+                x -= 1
+        else:
+            # Get tail and penultimate positions to determine the direction of body increase.
+            t_y, t_x = self.get_tail_position()
+            t_y_p, t_x_p = self.get_body_position(-2)
+            if t_y > t_y_p:
+                y += 1
+            elif t_y < t_y_p:
+                y -= 1
+            elif t_x > t_x_p:
+                x += 1
+            elif t_x < t_x_p:
+                x -= 1
 
-        # Update tail.
-        y, x = 0, 0
-        if self.tail_direction == 'UP':
-            y += 1
-        elif self.tail_direction == 'DOWN':
-            y -= 1
-        elif self.tail_direction == 'LEFT':
-            x += 1
-        elif self.tail_direction == 'RIGHT':
-            x -= 1
+        self.body.append({'y': y, 'x': x})
+        self.size += 1
 
-        self.body.append({'y': t_y + y, 'x': t_x + x})
-        self.length += 1
-
-    def move(self, direction):
+    def move(self):
         """
         Move the snake.
-
-        :param direction: direction of movement (-1, UP, DOWN, RIGHT, LEFT)
         """
-        # Move the snake body except for the head.
-        for i in range(self.length - 1, 0, -1):
-            self.body[i]['y'] = self.body[i-1]['y']
-            self.body[i]['x'] = self.body[i-1]['x']
+        # Delete the tail.
+        if self.size > 1:
+            del self.body[-1]
 
-        # Move the snake head.
-        if direction != -1:
-            self.head_direction = direction
+        # Move the snake tail to the front.
+        h_y, h_x = self.get_head_position()
         y, x = 0, 0
         if self.head_direction == 'UP':
             y -= 1
@@ -93,42 +129,12 @@ class Snake:
             x -= 1
         elif self.head_direction == 'RIGHT':
             x += 1
-        self.body[0]['y'] += y
-        self.body[0]['x'] += x
-
-        # Update the tail direction.
-        if self.length == 1:
-            self.tail_direction = self.head_direction
-        else:
-            if self.body[-1]['y'] > self.body[-2]['y']:
-                self.tail_direction = 'UP'
-            elif self.body[-1]['y'] < self.body[-2]['y']:
-                self.tail_direction = 'DOWN'
-            elif self.body[-1]['x'] > self.body[-2]['x']:
-                self.tail_direction = 'LEFT'
-            elif self.body[-1]['x'] < self.body[-2]['x']:
-                self.tail_direction = 'RIGHT'
-
-    def check_collision(self):
-        """
-        Check if the head of the snake hits its body.
-
-        :return: True if collision, False otherwise.
-        """
-        if self.length == 1:
-            return False
-        h_y, h_x = self.body[0]['y'], self.body[0]['x']
-        for body_part in self.body[1:]:
-            b_y = body_part['y']
-            b_x = body_part['x']
-            if h_y == b_y and h_x == b_x:
-                return True
-        return False
+        self.body.insert(0, {'y': h_y + y, 'x': h_x + x})
 
 
 class Food:
 
-    def __init__(self, max_y, max_x):
+    def __init__(self, max_y=0, max_x=0):
         """
         Food class.
 
@@ -141,17 +147,17 @@ class Food:
         self.max_x = max_x
         self.x = None
         self.y = None
-        self.generate_random_position()
+        self.random_position()
 
-    def get_current_position(self):
+    def get_position(self):
         """
         Getter for the current position of the food.
 
-        :return: tuple with y and x positions
+        :return: y and x food position
         """
         return self.y, self.x
 
-    def generate_random_position(self):
+    def random_position(self):
         """
         Generate a random position for the food.
         """

@@ -9,27 +9,26 @@ from components import Snake, Food
 
 class Game:
 
-    def __init__(self, stdscr, board_height=20, board_width=20, initial_speed=5):
+    def __init__(self, stdscr, board_height=20, board_width=20, initial_speed=7, speed_increase=1):
         self.stdscr = stdscr
         self.board_height = max(10, board_height)
         self.board_width = max(10, board_width)
         self.speed = initial_speed
+        self.speed_increase = speed_increase
         self.score = 0
 
-        self.direction_map = {-1: -1, curses.KEY_UP: 'UP', curses.KEY_DOWN: 'DOWN',
+        self.direction_map = {curses.KEY_UP: 'UP', curses.KEY_DOWN: 'DOWN',
                               curses.KEY_RIGHT: 'RIGHT', curses.KEY_LEFT: 'LEFT'}
 
-        # Sets the sreen.
-        self.start_screen()
+        self.setup_game()
 
-        # Instantiate snake and food.
-        self.snake = Snake(self.board_height, self.board_width)
-        self.food = Food(self.board_height, self.board_width)
+        self.snake = Snake(y=self.board_height//2, x=self.board_width//2, initial_size=3)
+        self.food = Food(max_y=self.board_height, max_x=self.board_width)
 
         # Start playing.
         self.play()
 
-    def start_screen(self):
+    def setup_game(self):
         """
         Sets options for the game screen.
         """
@@ -37,20 +36,34 @@ class Game:
         curses.curs_set(0)
         # Resize screen.
         self.stdscr.resize(self.board_height, self.board_width)
+        # Clear the screen.
+        self.stdscr.clear()
+        # Do not wait for a key press.
+        self.stdscr.nodelay(True)
 
-    def exit_game(self, msg):
+    def exit_game(self, exit_code):
         """
         Exits the game. Clears the board and prints a message.
 
-        :param msg: message to print.
+        :param exit_code: 'LOST', 'WIN', 'END'.
+        :type exit_code: str
         """
+        exit_msg = ""
+        if exit_code == 'LOST':
+            exit_msg = "You LOST!\nScore: {}".format(self.score)
+        elif exit_code == 'WIN':
+            exit_msg = "Congrats! You WON!\nScore: {}".format(self.score)
+        elif exit_code == 'END':
+            exit_msg = "You ended the game!\nScore: {}".format(self.score)
+
         self.stdscr.clear()
+        self.draw_board()
         self.stdscr.nodelay(False)
-        msg = msg + '\nPress any key to quit the game.'
-        i = 0
-        for line in msg.split('\n'):
-            self.stdscr.addstr(self.board_height // 2 + i, 1, line + '\n')
-            i += 1
+
+        exit_msg += '\n\nPress any key to quit the game.'
+        offset = 3
+        for i, msg in enumerate(exit_msg.split('\n')):
+            self.stdscr.addstr(self.board_height // 2 + i, offset, msg)
         self.stdscr.getch()
         exit(0)
 
@@ -72,8 +85,22 @@ class Game:
         :return: True if the head of the snake is at the same position as the food, False otherwise.
         """
         s_y, s_x = self.snake.get_head_position()
-        f_y, f_x = self.food.get_current_position()
+        f_y, f_x = self.food.get_position()
         return True if (s_y == f_y and s_x == f_x) else False
+
+    def check_snake_collision(self):
+        """
+        Check if the head of the snake hits its body.
+
+        :return: True if collision, False otherwise.
+        """
+        if self.snake.size == 1:
+            return False
+        h_y, h_x = self.snake.get_head_position()
+        for body_pos in self.snake.get_positions()[1:]:
+            if h_y == body_pos['y'] and h_x == body_pos['x']:
+                return True
+        return False
 
     def place_food(self):
         """
@@ -82,39 +109,51 @@ class Game:
         collision = True
         while collision:
             collision = False
-            self.food.generate_random_position()
-            f_y, f_x = self.food.get_current_position()
-            for snake_body in self.snake.get_body():
+            self.food.random_position()
+            f_y, f_x = self.food.get_position()
+            for snake_body in self.snake.get_positions():
                 s_y = snake_body['y']
                 s_x = snake_body['x']
                 if s_y == f_y and s_x == f_x:
                     collision = True
                     break
 
+    def draw_board(self):
+        """
+        Renders the board on screen.
+        """
+        self.stdscr.border('|', '|', '-', '-', '+', '+', '+', '+')
+
+    def draw_snake(self):
+        # Draw head.
+        h_y, h_x = self.snake.get_head_position()
+        self.stdscr.addch(h_y, h_x, self.snake.head_symbol)
+        # Draw body.
+        if self.snake.size > 1:
+            snake_symbol = self.snake.body_symbol
+            for snake_body in self.snake.get_positions()[1:]:
+                s_y, s_x = snake_body['y'], snake_body['x']
+                self.stdscr.addch(s_y, s_x, snake_symbol)
+
+    def draw_food(self):
+        f_y, f_x = self.food.get_position()
+        self.stdscr.addch(f_y, f_x, 'F')
+
     def render(self):
         """
         Renders the board, snake and food.
         """
-        # Draw the game board.
-        self.stdscr.box('#', '#')
+        # Render board.
+        self.draw_board()
 
         # Display the score.
         self.stdscr.addstr(0, self.board_width // 2 - 5, "Score: {}".format(self.score))
 
         # Render Snake.
-        snake_head_symbol = self.snake.head_symbol
-        snake_body_symbol = self.snake.body_symbol
-        for i, snake_body in enumerate(self.snake.get_body()):
-            s_y = snake_body['y']
-            s_x = snake_body['x']
-            snake_symbol = snake_body_symbol
-            if i == 0:
-                snake_symbol = snake_head_symbol
-            self.stdscr.addch(s_y, s_x, snake_symbol)
+        self.draw_snake()
 
         # Render Food.
-        f_y, f_x = self.food.get_current_position()
-        self.stdscr.addch(f_y, f_x, 'F')
+        self.draw_food()
 
         # Update the screen.
         self.stdscr.refresh()
@@ -125,43 +164,36 @@ class Game:
         """
         # Check for food collisions.
         if self.check_food_colision():
-            # Increase the score.
-            self.score += 1
-            # Increase the snake body.
-            self.snake.increase_body()
-            # Place the food in a random position.
             self.place_food()
-            # Increase game speed.
-            self.speed *= 1.05
+            # Increase the score, snake body and game speed.
+            self.score += 1
+            self.snake.increase_body()
+            self.speed += self.speed_increase
 
         # Check for body and board collisions.
-        if self.snake.check_collision() or self.check_board_collision():
-            # Exit the game if the snake hits itself or board walls.
-            self.exit_game("You lost!\nScore: {}".format(self.score))
+        if self.check_snake_collision() or self.check_board_collision():
+            self.exit_game('LOST')
 
     def play(self):
         """
         Implements the game logic.
         """
-        self.stdscr.clear()
-        # Do not wait for a key press.
-        self.stdscr.nodelay(True)
-
         while True:
             # Render objects on screen.
             self.render()
 
-            # Move the snake.
+            # Read key press.
             c = self.stdscr.getch()
             self.stdscr.clear()
 
             if c == ord('q'):
-                exit(0)
+                self.exit_game('END')
+            elif c in self.direction_map:
+                self.snake.change_direction(self.direction_map[c])
 
-            self.snake.move(self.direction_map[c])
+            self.snake.move()
 
             # Check for food, snake or board collisions.
             self.check_collisions()
 
             time.sleep(1 / self.speed)
-
