@@ -9,7 +9,7 @@ from components import Snake, Food
 
 class Game:
 
-    def __init__(self, stdscr, board_height=20, board_width=20, initial_speed=7, speed_increase=1):
+    def __init__(self, stdscr, board_height=20, board_width=20, initial_speed=5, speed_increase=1):
         self.stdscr = stdscr
         self.board_height = max(10, board_height)
         self.board_width = max(10, board_width)
@@ -20,8 +20,8 @@ class Game:
         self.direction_map = {curses.KEY_UP: 'UP', curses.KEY_DOWN: 'DOWN',
                               curses.KEY_RIGHT: 'RIGHT', curses.KEY_LEFT: 'LEFT'}
 
+        # Setup board, snake and food.
         self.setup_game()
-
         self.snake = Snake(y=self.board_height//2, x=self.board_width//2, initial_size=3)
         self.food = Food(max_y=self.board_height, max_x=self.board_width)
 
@@ -30,7 +30,7 @@ class Game:
 
     def setup_game(self):
         """
-        Sets options for the game screen.
+        Sets options for the game board.
         """
         # Hide cursor.
         curses.curs_set(0)
@@ -97,8 +97,9 @@ class Game:
         if self.snake.size == 1:
             return False
         h_y, h_x = self.snake.get_head_position()
-        for body_pos in self.snake.get_positions()[1:]:
-            if h_y == body_pos['y'] and h_x == body_pos['x']:
+        for i in range(1, self.snake.size):
+            b_y, b_x = self.snake.get_body_position(i)
+            if h_y == b_y and h_x == b_x:
                 return True
         return False
 
@@ -112,8 +113,8 @@ class Game:
             self.food.random_position()
             f_y, f_x = self.food.get_position()
             for snake_body in self.snake.get_positions():
-                s_y = snake_body['y']
-                s_x = snake_body['x']
+                s_y = snake_body.y
+                s_x = snake_body.x
                 if s_y == f_y and s_x == f_x:
                     collision = True
                     break
@@ -131,8 +132,8 @@ class Game:
         # Draw body.
         if self.snake.size > 1:
             snake_symbol = self.snake.body_symbol
-            for snake_body in self.snake.get_positions()[1:]:
-                s_y, s_x = snake_body['y'], snake_body['x']
+            for i in range(1, self.snake.size):
+                s_y, s_x = self.snake.get_body_position(i)
                 self.stdscr.addch(s_y, s_x, snake_symbol)
 
     def draw_food(self):
