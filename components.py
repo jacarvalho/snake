@@ -3,6 +3,10 @@ Copyright 2019
 Author: Joao Carvalho <joao.ac.carvalho@gmail.com>
 """
 from random import randint
+from collections import namedtuple
+
+
+Point = namedtuple('Point', ['y', 'x'])
 
 
 class Snake:
@@ -24,7 +28,7 @@ class Snake:
         self.head_symbol = 'O'
         self.body_symbol = 'o'
         self.head_direction = 'RIGHT'
-        self.body = [{'y': y, 'x': x}]
+        self.body = [Point(y, x)]
         self.size = initial_size
 
         self.setup_snake()
@@ -34,8 +38,7 @@ class Snake:
         Setup a snake body horizontally with the head on the right side.
         """
         for i in range(0, self.size):
-            self.body.append({'y': self.body[i]['y'], 'x': self.body[i]['x']-1})
-            self.size += 1
+            self.body.append(Point(self.body[i].y, self.body[i].x - 1))
 
     def get_head_position(self):
         """
@@ -43,7 +46,7 @@ class Snake:
 
         :return: y and x head position
         """
-        return self.body[0]['y'], self.body[0]['x']
+        return self.body[0].y, self.body[0].x
 
     def get_tail_position(self):
         """
@@ -51,7 +54,7 @@ class Snake:
 
         :return: y and x tail position
         """
-        return self.body[-1]['y'], self.body[-1]['x']
+        return self.body[-1].y, self.body[-1].x
 
     def get_body_position(self, ind):
         """
@@ -61,7 +64,7 @@ class Snake:
         :type ind: int
         :return: y and x position at index ind
         """
-        return self.body[ind]['y'], self.body[ind]['x']
+        return self.body[ind].y, self.body[ind].x
 
     def get_positions(self):
         """
@@ -107,7 +110,7 @@ class Snake:
             elif t_x < t_x_p:
                 x -= 1
 
-        self.body.append({'y': y, 'x': x})
+        self.body.append(Point(y, x))
         self.size += 1
 
     def move(self):
@@ -129,7 +132,7 @@ class Snake:
             x -= 1
         elif self.head_direction == 'RIGHT':
             x += 1
-        self.body.insert(0, {'y': h_y + y, 'x': h_x + x})
+        self.body.insert(0, Point(h_y + y, h_x + x))
 
 
 class Food:
@@ -145,8 +148,7 @@ class Food:
         """
         self.max_y = max_y
         self.max_x = max_x
-        self.x = None
-        self.y = None
+        self.position = Point(None, None)
         self.random_position()
 
     def get_position(self):
@@ -155,11 +157,10 @@ class Food:
 
         :return: y and x food position
         """
-        return self.y, self.x
+        return self.position.y, self.position.x
 
     def random_position(self):
         """
         Generate a random position for the food.
         """
-        self.y = randint(1, self.max_y - 2)
-        self.x = randint(1, self.max_x - 2)
+        self.position = Point(randint(1, self.max_y - 2), randint(1, self.max_x - 2))
