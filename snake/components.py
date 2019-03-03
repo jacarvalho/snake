@@ -37,7 +37,7 @@ class Snake:
         """
         Setup a snake body horizontally with the head on the right side.
         """
-        for i in range(0, self.size):
+        for i in range(0, self.size-1):
             self.body.append(Point(self.body[i].y, self.body[i].x - 1))
 
     def get_head_position(self):
@@ -66,7 +66,7 @@ class Snake:
         """
         return self.body[ind].y, self.body[ind].x
 
-    def get_positions(self):
+    def get_body(self):
         """
         Getter for the snake positions.
 

@@ -4,12 +4,21 @@ Author: Joao Carvalho <joao.ac.carvalho@gmail.com>
 """
 import curses
 import time
-from components import Snake, Food
+from .components import Snake, Food
 
 
 class Game:
 
-    def __init__(self, stdscr, board_height=20, board_width=20, initial_speed=5, speed_increase=1):
+    def __init__(self, stdscr, board_height=20, board_width=20, initial_speed=2, speed_increase=0.5):
+        """
+        Game class implements the logic and manages the gameplay.
+
+        :param stdscr:
+        :param board_height:
+        :param board_width:
+        :param initial_speed:
+        :param speed_increase:
+        """
         self.stdscr = stdscr
         self.board_height = max(10, board_height)
         self.board_width = max(10, board_width)
@@ -24,9 +33,6 @@ class Game:
         self.setup_game()
         self.snake = Snake(y=self.board_height//2, x=self.board_width//2, initial_size=3)
         self.food = Food(max_y=self.board_height, max_x=self.board_width)
-
-        # Start playing.
-        self.play()
 
     def setup_game(self):
         """
@@ -112,7 +118,7 @@ class Game:
             collision = False
             self.food.random_position()
             f_y, f_x = self.food.get_position()
-            for snake_body in self.snake.get_positions():
+            for snake_body in self.snake.get_body():
                 s_y = snake_body.y
                 s_x = snake_body.x
                 if s_y == f_y and s_x == f_x:
@@ -138,7 +144,7 @@ class Game:
 
     def draw_food(self):
         f_y, f_x = self.food.get_position()
-        self.stdscr.addch(f_y, f_x, 'F')
+        self.stdscr.addch(f_y, f_x, 'X')
 
     def render(self):
         """
