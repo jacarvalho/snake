@@ -1,17 +1,25 @@
-### Snake Game in Python
+### Snake Game in your Terminal with Python3
 
-Snake game programmed in python using the curses library.
+This is a simple version of the traditional [snake game](https://en.wikipedia.org/wiki/Snake_(video_game_genre\)) written in python and using the curses library.
+
 
 #### Setup
 ```bash
-virtualenv -p python3 venv
-source venv/bin/activate
-python setup.py
+git clone https://github.com/jacarvalho/snake
+cd snake
+python3 setup.py install
 ```
 
-#### How to run
+#### Run
 
 ```bash
-python -m snake.py
+python3 -m snake.py
 ```
+
+#### Test and checkstyle
+
+```bash
+make
+```
+
 

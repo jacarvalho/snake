@@ -10,11 +10,11 @@ compile:
 	@echo "Nothing to compile for Python"
 
 test:
-	$(TEST_CMD) tests/test_*.py
+	$(TEST_CMD) tests/test*.py
 
 checkstyle:
 	$(CHECKSTYLE_CMD) *.py snake/*.py tests/*.py
 
 clean:
-	rm -f *.pyc
-	rm -rf __pycache__
+	rm -f *.pyc snake/*.pyc tests/*.pyc
+	rm -rf __pycache__ snake/__pycache__ tests/__pycache__

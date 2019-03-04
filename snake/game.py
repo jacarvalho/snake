@@ -9,7 +9,7 @@ from .components import Snake, Food
 
 class Game:
 
-    def __init__(self, stdscr, board_height=20, board_width=20, initial_speed=2, speed_increase=0.5):
+    def __init__(self, stdscr, board_height=20, board_width=40, initial_speed=2, speed_increase=0.5):
         """
         Game class implements the logic and manages the gameplay.
 

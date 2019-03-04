@@ -137,7 +137,7 @@ class Snake:
 
 class Food:
 
-    def __init__(self, max_y=0, max_x=0):
+    def __init__(self, max_y=3, max_x=3):
         """
         Food class.
 
