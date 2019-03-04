@@ -2,6 +2,8 @@
 
 This is a simple version of the traditional [snake game](https://en.wikipedia.org/wiki/Snake_(video_game_genre)) written in python, using the curses library.
 
+---
+
 
 #### Setup
 ```bash
@@ -9,6 +11,8 @@ git clone https://github.com/jacarvalho/snake
 cd snake
 python3 setup.py install
 ```
+
+---
 
 #### Play
 
@@ -27,7 +31,7 @@ python3 -m snake.py
 - To quit the game press 'q'
 ```
 
-
+---
 
 #### Test and checkstyle
 
