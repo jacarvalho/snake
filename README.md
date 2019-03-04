@@ -19,7 +19,7 @@ python3 setup.py install
 ##### Run
 
 ```bash
-python3 -m snake.py
+python3 -m snake
 ```
 
 ##### Instructions
