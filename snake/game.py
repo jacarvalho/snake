@@ -179,6 +179,7 @@ class Game:
 
         # Check for body and board collisions.
         if self.check_snake_collision() or self.check_board_collision():
+            time.sleep(1.5)
             self.exit_game('LOST')
 
     def play(self):
