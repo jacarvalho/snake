@@ -9,6 +9,9 @@ from snake.game import Game
 
 
 class TestSnake(unittest.TestCase):
+    """
+    Test the Snake class methods.
+    """
 
     def test_setup_snake(self):
         snake = Snake(5, 5, initial_size=3)
@@ -90,6 +93,9 @@ class TestSnake(unittest.TestCase):
 
 
 class TestGame(unittest.TestCase):
+    """
+    Test the Game class methods.
+    """
 
     def test_board_collision(self):
         # Right border.

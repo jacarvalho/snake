@@ -11,13 +11,19 @@ class Game:
 
     def __init__(self, stdscr, board_height=20, board_width=40, initial_speed=2, speed_increase=0.5):
         """
-        Game class implements the logic and manages the gameplay.
+        This class implements the game logic and manages the gameplay.
+        A snake moves around a board game, changing its direction when the player presses on of the arrow keys.
 
-        :param stdscr:
-        :param board_height:
-        :param board_width:
-        :param initial_speed:
-        :param speed_increase:
+        :param stdscr: a curses initial screen
+        :type stdscr: window
+        :param board_height: board game height
+        :type board_height: int
+        :param board_width: board game width
+        :type board_width: int
+        :param initial_speed: initial game speed
+        :int initial_speed: int
+        :param speed_increase: game speed incremental increase after eating a food element
+        :type speed_increase: int
         """
         self.stdscr = stdscr
         self.board_height = max(10, board_height)
@@ -36,7 +42,7 @@ class Game:
 
     def setup_game(self):
         """
-        Sets options for the game board.
+        Set the board game.
         """
         # Hide cursor.
         curses.curs_set(0)
@@ -49,9 +55,9 @@ class Game:
 
     def exit_game(self, exit_code):
         """
-        Exits the game. Clears the board and prints a message.
+        Exits the game. Clears the board, prints a message and exits.
 
-        :param exit_code: 'LOST', 'WIN', 'END'.
+        :param exit_code: 'LOST', 'WIN', 'END'
         :type exit_code: str
         """
         exit_msg = ""
@@ -75,9 +81,9 @@ class Game:
 
     def check_board_collision(self):
         """
-        Check if the snake hit the board wall.
+        Check if the snake hits the board wall.
 
-        :return: True if the snake hits the board wall, False otherwise.
+        :return: True if the snake hits the board wall, False otherwise
         """
         s_y, s_x = self.snake.get_head_position()
         if s_y == 0 or s_y == self.board_height - 1 or s_x == 0 or s_x == self.board_width - 1:
@@ -86,9 +92,9 @@ class Game:
 
     def check_food_colision(self):
         """
-        Checks if the head of the snake ate the food.
+        Checks if the snake head ate the food.
 
-        :return: True if the head of the snake is at the same position as the food, False otherwise.
+        :return: True if the head of the snake is at the same position as the food, False otherwise
         """
         s_y, s_x = self.snake.get_head_position()
         f_y, f_x = self.food.get_position()
@@ -96,9 +102,9 @@ class Game:
 
     def check_snake_collision(self):
         """
-        Check if the head of the snake hits its body.
+        Check if the snake head hits its body.
 
-        :return: True if collision, False otherwise.
+        :return: True if collision with any body part, False otherwise
         """
         if self.snake.size == 1:
             return False
@@ -127,11 +133,14 @@ class Game:
 
     def draw_board(self):
         """
-        Renders the board on screen.
+        Renders the board game on screen.
         """
         self.stdscr.border('|', '|', '-', '-', '+', '+', '+', '+')
 
     def draw_snake(self):
+        """
+        Render the snake on screen.
+        """
         # Draw head.
         h_y, h_x = self.snake.get_head_position()
         self.stdscr.addch(h_y, h_x, self.snake.head_symbol)
@@ -143,12 +152,15 @@ class Game:
                 self.stdscr.addch(s_y, s_x, snake_symbol)
 
     def draw_food(self):
+        """
+        Render the food on screen.
+        """
         f_y, f_x = self.food.get_position()
         self.stdscr.addch(f_y, f_x, 'X')
 
     def render(self):
         """
-        Renders the board, snake and food.
+        Renders the board game, snake and food.
         """
         # Render board.
         self.draw_board()
@@ -167,7 +179,8 @@ class Game:
 
     def check_collisions(self):
         """
-        Checks for food, snake and board collisions.
+        Check for food, snake and board collisions.
+        If there's a food colision, enlarge the snake body. If the snake hits itself or the board, quit the game.
         """
         # Check for food collisions.
         if self.check_food_colision():
@@ -179,12 +192,12 @@ class Game:
 
         # Check for body and board collisions.
         if self.check_snake_collision() or self.check_board_collision():
-            time.sleep(1.5)
+            time.sleep(1.5)  # Display the last state of the game.
             self.exit_game('LOST')
 
     def play(self):
         """
-        Implements the game logic.
+        Implement the game logic.
         """
         while True:
             # Render objects on screen.

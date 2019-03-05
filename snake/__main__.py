@@ -3,7 +3,6 @@ Copyright 2019
 Author: Joao Carvalho <joao.ac.carvalho@gmail.com>
 """
 import curses
-import configparser
 from snake.game import Game
 
 
