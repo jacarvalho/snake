@@ -2,6 +2,8 @@
 
 This is a simple version of the traditional [snake game](https://en.wikipedia.org/wiki/Snake_(video_game_genre)) written in python, using the curses library.
 
+![snake_game](/Users/joaocarvalho/Documents/Files/03_Projects/snake/img/snake_game.png)
+
 ---
 
 
