@@ -12,8 +12,10 @@ class Game:
     def __init__(self, stdscr, board_height=20, board_width=40, initial_speed=2, speed_increase=0.5):
         """
         This class implements the game logic and manages the gameplay.
-        A snake moves around a board game, changing its direction when the player presses on of the arrow keys.
-
+        A snake moves around a board game, changing its direction when the player presses one of the keyboard arrow keys.
+        The goal is to collect as many food as possible. If the snake eats the food the score increases by one.
+        The game ends if the snake hits itself or the board walls.
+        
         :param stdscr: a curses initial screen
         :type stdscr: window
         :param board_height: board game height
