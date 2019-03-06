@@ -8,7 +8,6 @@ from snake.game import Game
 
 def play_game(stdsrc):
     snake_game = Game(stdsrc)
-
     snake_game.play()
 
 
