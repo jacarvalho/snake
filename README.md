@@ -2,7 +2,7 @@
 
 This is a simple version of the traditional [snake game](https://en.wikipedia.org/wiki/Snake_(video_game_genre)) written in python3, using the curses library.
 
-![](./img/snake_clip.gif)
+![snake game clip](./img/snake_clip.gif)
 
 ---
 
