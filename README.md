@@ -21,16 +21,16 @@ python3 setup.py install
 ##### Run
 
 ```bash
-python3 -m snake
+python3 snake
 ```
 
 ##### Instructions
 
 ```
-- Move the snake with the keyboard KEYS
+- Move the snake with the ARROW keys
 - Collect the 'food', indicated by 'X'
 - The game ends if the snake hits itself or the wall
-- To quit the game press 'q'
+- To quit the game earlier press 'q'
 ```
 
 ---
