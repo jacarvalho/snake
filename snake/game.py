@@ -12,10 +12,10 @@ class Game:
     def __init__(self, stdscr, board_height=20, board_width=40, initial_speed=2, speed_increase=0.5):
         """
         This class implements the game logic and manages the gameplay.
-        A snake moves around a board game, changing its direction when the player presses one of the keyboard arrow keys.
-        The goal is to collect as many food as possible. If the snake eats the food the score increases by one.
-        The game ends if the snake hits itself or the board walls.
-        
+        A snake moves around a board game, changing its direction when the player presses one of the keyboard
+        arrow keys. The goal is to collect as many food as possible. If the snake eats the food the score
+        increases by one. The game ends if the snake hits itself or the board walls.
+
         :param stdscr: a curses initial screen
         :type stdscr: window
         :param board_height: board game height
@@ -77,7 +77,7 @@ class Game:
         exit_msg += '\n\nPress any key to quit the game.'
         offset = 3
         for i, msg in enumerate(exit_msg.split('\n')):
-            self.stdscr.addstr(self.board_height // 2 + i, offset, msg)
+            self.stdscr.addstr(self.board_height // 2 - 5 + i, offset, msg)
         self.stdscr.getch()
         exit(0)
 
@@ -197,10 +197,28 @@ class Game:
             time.sleep(1.5)  # Display the last state of the game.
             self.exit_game('LOST')
 
+    def welcome_screen(self):
+        """
+        Welcoming screen.
+        """
+        # Wait for a key press.
+        self.stdscr.nodelay(False)
+        self.draw_board()
+        msg = "Welcome to the SNAKE game!\n\nCollect as much as food as \nyou can by moving the snake \n"
+        msg += "with the ARROW keys.\n\nPress any key to start playing.\nPress q to quit at anytime."
+        offset = 3
+        for i, line in enumerate(msg.split('\n')):
+            self.stdscr.addstr(self.board_height // 2 - 6 + i, offset, line)
+        self.stdscr.getch()
+        self.stdscr.clear()
+        # Do not wait for a key press.
+        self.stdscr.nodelay(True)
+
     def play(self):
         """
         Implement the game logic.
         """
+        self.welcome_screen()
         while True:
             # Render objects on screen.
             self.render()

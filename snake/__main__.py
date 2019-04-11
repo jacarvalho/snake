@@ -3,6 +3,7 @@ Copyright 2019
 Author: Joao Carvalho <joao.ac.carvalho@gmail.com>
 """
 import curses
+# from snake.game import Game
 from snake.game import Game
 
 
